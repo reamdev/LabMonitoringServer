@@ -1,0 +1,41 @@
+datasource db {
+  provider = "sqlite" // o "postgresql", "mysql", según lo que uses
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Laboratorio {
+  id          Int           @id @default(autoincrement())
+  nombre      String
+  ubicacion   String?
+  computadoras Computadora[]
+}
+
+model Computadora {
+  id            Int       @id @default(autoincrement())
+  nombre        String
+  laboratorioId Int
+  laboratorio   Laboratorio @relation(fields: [laboratorioId], references: [id])
+  sesiones      Sesion[]
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  codigo    String   @unique
+  nombre    String
+  rol       String
+  sesiones  Sesion[]
+}
+
+model Sesion {
+  id             Int        @id @default(autoincrement())
+  usuarioId      Int
+  computadoraId  Int
+  horaInicio     DateTime   @default(now())
+  horaFin        DateTime?
+  usuario        Usuario     @relation(fields: [usuarioId], references: [id])
+  computadora    Computadora @relation(fields: [computadoraId], references: [id])
+}
